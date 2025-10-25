@@ -17,11 +17,12 @@ class Tree {
         Node* addChild(char);
 
         ~Node();
+
+        void saveNode(std::ostream& os) const;
+        //Node*
     };
 
-    std::vector<Node*> starts = {};
-
-    Node* getStart(char) const;
+    Node* root = new Node('%');
 
     public:
     Tree() = default;

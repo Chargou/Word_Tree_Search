@@ -1,11 +1,7 @@
 #include "Tree.h"
-#include <fstream>
 
-Tree::Node* Tree::getStart(const char c) const {
-    for (Node *s : starts)
-        if (s->data == c) return s;
-    return nullptr;
-}
+#include <filesystem>
+#include <fstream>
 
 Tree::Node* Tree::Node::getNext(const char c) const {
     for (Node *s : children)
@@ -14,7 +10,7 @@ Tree::Node* Tree::Node::getNext(const char c) const {
 }
 
 Tree::Node* Tree::Node::addChild(const char c) {
-    Node* temp = getNext(c);
+    Node* temp = getNext(std::tolower(c));
     if (temp != nullptr) return temp;
     temp = new Node(c);
     children.push_back(temp);
@@ -26,30 +22,32 @@ Tree::Node::~Node() {
         delete s;
 }
 
+void Tree::Node::saveNode(std::ostream &os) const {
+    os << data
+       << static_cast<char>(is_valid_end)
+       << static_cast<uint16_t>(children.size());
+    for (Node *s : children)
+        s->saveNode(os);
+}
+
 
 Tree::~Tree() {
-    for (Node *s : starts)
-        delete s;
+    delete root;
 }
 
 bool Tree::isValidWord(const std::string &word) const {
-    const Node* temp = getStart(word[0]); // The const here doesn't make the variable itself const, but it makes what's on the end of the pointer const
-    if (temp == nullptr) return false;
-    for (int i = 1; i < word.size(); i++) {
-        temp = temp->getNext(word[i]);
+    const Node* temp = root; // The const here doesn't make the variable itself const, but it makes what's on the end of the pointer const
+    for (char c : word) {
+        temp = temp->getNext(std::tolower(c));
         if (temp == nullptr) return false;
     }
     return temp->is_valid_end;
 }
 
 void Tree::addWord(const std::string &word) {
-    Node* temp = getStart(word[0]);
-    if (temp == nullptr) {
-        temp = new Node(word[0]);
-        starts.push_back(temp);
-    }
-    for (int i = 1; i < word.size(); i++)
-        temp = temp->addChild(word[i]);
+    Node* temp = root;
+    for (char c : word)
+        temp = temp->addChild(c);
     temp->is_valid_end = true;
 }
 
