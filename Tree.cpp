@@ -30,6 +30,22 @@ void Tree::Node::saveNode(std::ostream &os) const {
         child->saveNode(os);
 }
 
+Tree::Node * Tree::readNode(std::ifstream &file) {
+    char data;
+    char is_valid_end;
+    uint8_t children_count;
+    file >> std::noskipws >> data >> is_valid_end >> children_count;
+    Node* res = new Node(data);
+    res->is_valid_end = is_valid_end;
+    Node* temp = nullptr;
+    for (uint8_t i = 0; i < children_count; i++) {
+        temp = readNode(file);
+        res->children[temp->data] = temp;
+    }
+    if (children_count != res->children.size()) {throw std::runtime_error("unexpected children count: " + std::to_string(children_count) + " != " + std::to_string(res->children.size()));}
+    return res;
+}
+
 
 Tree::~Tree() {
     delete root;
@@ -62,5 +78,16 @@ void Tree::addWordsFromFile(const std::string &filename) {
     std::string word;
     while (std::getline(file, word))
         addWord(word);
+}
+
+void Tree::saveTree(std::string filename) const {
+    std::ofstream file(filename, std::ios::out | std::ios::binary);
+    root->saveNode(file);
+}
+
+Tree::Tree(std::string filename) {
+    std::ifstream file(filename, std::ios::in | std::ios::binary);
+    if (!file.is_open()) throw std::invalid_argument("File not found");
+    root = readNode(file);
 }
 

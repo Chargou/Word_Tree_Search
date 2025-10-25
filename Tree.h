@@ -20,10 +20,12 @@ class Tree {
         ~Node();
 
         void saveNode(std::ostream& os) const;
-        //Node*
+
     };
 
     Node* root = new Node('%'); // This char data should never be accessed so we could put whatever in there
+
+    static Node* readNode(std::ifstream& file);
 
     public:
     Tree() = default;
@@ -34,4 +36,7 @@ class Tree {
     void addWord(const std::string &word);
     void addWords(const std::vector<std::string> &words);
     void addWordsFromFile(const std::string &filename);
+
+    void saveTree(std::string filename) const;
+    Tree(std::string filename);
 };
