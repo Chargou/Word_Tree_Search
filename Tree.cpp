@@ -4,30 +4,30 @@
 #include <fstream>
 
 Tree::Node* Tree::Node::getNext(const char c) const {
-    for (Node *s : children)
-        if (s->data == c) return s;
-    return nullptr;
+    const auto it = children.find(c);
+    if (it == children.end()) return nullptr;
+    return it->second;
 }
 
 Tree::Node* Tree::Node::addChild(const char c) {
     Node* temp = getNext(std::tolower(c));
     if (temp != nullptr) return temp;
     temp = new Node(c);
-    children.push_back(temp);
+    children[c] = temp;
     return temp;
 }
 
 Tree::Node::~Node() {
-    for (Node *s : children)
-        delete s;
+    for (auto [_, child] : children)
+        delete child;
 }
 
 void Tree::Node::saveNode(std::ostream &os) const {
     os << data
        << static_cast<char>(is_valid_end)
-       << static_cast<uint16_t>(children.size());
-    for (Node *s : children)
-        s->saveNode(os);
+       << static_cast<uint8_t>(children.size());
+    for (auto [_, child] : children)
+        child->saveNode(os);
 }
 
 

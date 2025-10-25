@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 class Tree {
@@ -8,7 +9,7 @@ class Tree {
         public:
         char data;
         bool is_valid_end = false;
-        std::vector<Node*> children = {};
+        std::pmr::unordered_map<char, Node*> children = {};
 
         explicit Node(const char c) : data(c) {}
 
@@ -22,7 +23,7 @@ class Tree {
         //Node*
     };
 
-    Node* root = new Node('%');
+    Node* root = new Node('%'); // This char data should never be accessed so we could put whatever in there
 
     public:
     Tree() = default;
